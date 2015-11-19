@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Kill it!</title>
+<body>
+                <canvas id="canvas" width="0" height="0"></canvas>
+                  <script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+<script>
+
+
+// Create the canvas  
+var canvas = document.createElement("canvas");  
+var ctx = canvas.getContext("2d");  
+canvas.width = 800;
+canvas.height = 600;  
+document.body.appendChild(canvas); 
+
+//game instruction
+alert("This is a game for two people. One plays the role of hero, you should use the keys for directions to move and catch the monster. The other one plays the role of monster, you should use z,c,x,d to move left,right,down and up. There are 60 seconds for hero, every time you catch a monster you will get extra 10 seconds. Else, if you fail to catch one monster in 60 seconds, you lose. Monster win.;")
+var name = prompt("Please enter your name, Hero!", " ")
+   if (name){
+   alert("Let's catch the monster, Hero " + name)
+   }
+alert("Monster! You need to survive!")
+
+//Background image  
+var bgReady = false;  
+var bgImage = new Image();  
+bgImage.onload = function(){ 
+    bgReady = true;  
+};  
+bgImage.src = "http://www.freelargeimages.com/wp-content/uploads/2014/12/Tumblr_Backgrounds_02.jpg"
+
+// Hero image  
+var heroReady = false;  
+var heroImage = new Image();  
+heroImage.onload = function () {  
+    heroReady = true;  
+};  
+heroImage.src = "http://eng331epicrooks.weebly.com/uploads/1/8/5/7/18573842/3548311_orig.png"
+
+// Monster image  
+var monsterReady = false;  
+var monsterImage = new Image();  
+monsterImage.onload = function () {  
+    monsterReady = true;  
+};  
+monsterImage.src = "http://colouringbook.org/SVG/bandicoot/COLOURINGBOOK.ORG/black/S/small_funny_angry_monster_black_white_line_art_coloring_sheet_colouring_page-555px.png"
+
+// Game objects  
+var hero = {  
+    xspeed: 256,
+    yspeed: 256,
+    speed:0,
+     // movement in pixels per second  
+    x: 0,  
+    y: 0 
+};  
+var monster = {  
+    xspeed: 200,
+    yspeed:200,
+    x: 0,  
+    y: 0 
+ 
+};  
+var monstersCaught = 0;  
+
+// Handle keyboard controls  
+var keysDown = {};  
+addEventListener("keydown", function (e) {  
+     keysDown[e.keyCode] = true;  
+}, false);  
+addEventListener("keyup", function (e) {  
+     delete keysDown[e.keyCode];  
+}, false);  
+
+// Reset the game when the player catches a monster  
+var reset = function () {  
+     // Throw the monster somewhere on the screen randomly  
+     monster.x = 50 + (Math.random() * (canvas.width - 100));  
+     monster.y = 50 + (Math.random() * (canvas.height - 100));  
+};  
+
+// Update game objects  
+var update = function (modifier) {  
+    if (38 in keysDown) { // Player holding up  
+        hero.y -= hero.yspeed * modifier;  
+        if (hero.y < 0){
+          hero.y = 0}
+    }  
+    if (40 in keysDown) { // Player holding down  
+        hero.y += hero.yspeed * modifier;  
+        if (hero.y > 500){
+          hero.y = 500}
+    }  
+    if (37 in keysDown) { // Player holding left  
+        hero.x -= hero.xspeed * modifier;  
+         if(hero.x < 0){
+          hero.x = 0}
+    }  
+    if (39 in keysDown) { // Player holding right  
+        hero.x += hero.xspeed * modifier;  
+         if(hero.x > 700){
+          hero.x = 700}
+    }  
+    if (90 in keysDown){ //ghost holding left
+        monster.x -= monster.xspeed * modifier;
+        if(monster.x < 25){
+          monster.x = 25}
+    }
+    if (67 in keysDown){ //ghost holding right
+        monster.x += monster.xspeed * modifier;
+        if (monster.x > 725){
+         monster.x =725}
+    }
+    if (68 in keysDown){ //ghost holding up
+        monster.y -= monster.yspeed * modifier;
+        if(monster.y < 0){
+         monster.y = 0}
+    }
+    if (88 in keysDown){ //ghost holding down
+        monster.y += monster.yspeed * modifier;
+        if(monster.y > 520){
+        monster.y = 520}
+    }
+    if (65 in keysDown){ //ghost's saving life method
+      
+        monster.x = 25;
+        monster.y = 0}
+    
+  
+    // Are they touching?  
+    if (  
+        hero.x <= (monster.x + 20)
+            &&monster.x <= (hero.x + 40)  
+            && hero.y <= (monster.y + 25)  
+            && monster.y <= (hero.y + 25)  
+    ) {  
+         ++monstersCaught; 
+         lalala += 10; 
+         reset();  
+    }  
+    
+};  
+   
+// Draw everything  
+var draw = function () {  
+    if (bgReady) {  
+         ctx.drawImage(bgImage, 0, 0,800,600);  
+    }  
+  
+    if (heroReady) {  
+         ctx.drawImage(heroImage, hero.x, hero.y,100,100);  
+    }  
+  
+    if (monsterReady) {  
+         ctx.drawImage(monsterImage, monster.x, monster.y,50,50);  
+    }  
+  
+// Score  
+    ctx.fillStyle = "rgb(250, 250, 250)";  
+    ctx.font = "24px Helvetica";  
+    ctx.textAlign = "left";  
+    ctx.textBaseline = "top";  
+    ctx.fillText("Monsters caught: " + monstersCaught, 50,50);  
+};  
+
+var timer = 0
+var remainingtime = 60;
+var lalala=60;
+
+// The main game loop  
+var start = function () { 
+	++timer;
+	var now = Date.now();  
+    var delta = now - then;  
+    update(delta / 1000);  
+    draw();  
+    then = now;  
+ctx.fillStyle = "rgb(250, 250, 250)";  
+    ctx.font = "24px Helvetica";  
+    ctx.textAlign = "left";  
+    ctx.textBaseline = "top";  
+    ctx.fillText("Remaining time: " + remainingtime, 100,100); 
+    remainingtime =lalala- Math.floor(timer / 350);
+    if(remainingtime <= 0 && monstersCaught === 0 ){ 
+    ctx.fillStyle = "rgb(250, 250, 250)";  
+    ctx.font = "40px Helvetica";  
+    ctx.textAlign = "left";  
+    ctx.textBaseline = "top";  
+    ctx.fillText("Hero, you lose!",300,300)
+    remainingtime = 0;
+    return;  
+   }
+   if (remainingtime <= 0){
+    ctx.fillStyle = "rgb(250, 250, 250)";  
+    ctx.font = "40px Helvetica";  
+    ctx.textAlign = "left";  
+    ctx.textBaseline = "top";  
+    ctx.fillText("Hero, you have killed "+ mostersCaught + " monsters!",300,300)
+    remainingtime = 0};
+   if(monstersCaught === 4){
+    ctx.fillStyle = "rgb(250, 250, 250)";  
+    ctx.font = "15px Helvetica";  
+    ctx.textAlign = "left";  
+    ctx.textBaseline = "top";  
+    ctx.fillText("Monster,you are in danger! When you almost die, press A to go back to starting point to save yourself!",0,200)
+    }
+};  
+
+
+
+
+// Let's play this game!  
+reset();  
+var then = Date.now();  
+function nextstep(){
+  clearInterval(firstKill)
+  alert("Next step!")
+}
+var check = false;
+var firstKill = setInterval(function(){start(); 
+if(monstersCaught >= 20){
+  nextstep();
+  check = true;
+  }}, 1); 
+if (check);
+
+
+var second = setInterval(function(){start(); 
+  }, 1); 
+
+
+
+</script>
+</body>
+</html>
